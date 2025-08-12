@@ -1128,3 +1128,4 @@ function api_lesson_delete(): void {
     $st = db()->prepare('DELETE FROM lessons WHERE id=?'); $st->execute([$id]);
     json_response(['ok'=>true]);
 }
+// Конец файла crud.php
