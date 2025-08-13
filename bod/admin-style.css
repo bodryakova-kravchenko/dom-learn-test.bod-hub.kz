@@ -1,0 +1,60 @@
+/* Стили админ-панели DOMLearn
+   Цель: изолировать оформление админки от публичной части
+   Примечание: подключается только на /bod */
+
+:root {
+  --admin-accent: #1f6feb;
+  --admin-bg: #f7f9fc;
+  --admin-text: #0b1220;
+  --admin-muted: #6b7280;
+  --admin-border: #e5e7eb;
+}
+
+body.admin-body {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+/* Контейнер админки */
+#adminApp {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+/* Верхние вкладки уровней */
+.level-tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.level-tabs .tab {
+  border: 1px solid var(--admin-border);
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.level-tabs .tab.active { background: var(--admin-accent); color: #fff; border-color: var(--admin-accent); }
+
+/* Левая/правая колонка */
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 860px) { .columns { grid-template-columns: 1fr; } }
+
+.sections-wrap, .lessons-wrap { background: #fff; border: 1px solid var(--admin-border); border-radius: 10px; padding: 12px; }
+
+/* Формы */
+input[type="text"], textarea {
+  width: 100%;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+button.btn {
+  background: var(--admin-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+button.btn.outline { background: #fff; color: var(--admin-accent); border: 1px solid var(--admin-accent); }
+
+.muted { color: var(--admin-muted); }

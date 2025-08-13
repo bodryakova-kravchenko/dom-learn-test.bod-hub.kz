@@ -304,7 +304,8 @@ function render_header(string $title, bool $with_topbar = true): void {
     echo '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>' . e($title) . ' — DOMLearn</title>';
     echo '<link rel="icon" href="' . asset('/__assets__/images/favicon.ico') . '" type="image/x-icon">';
-    echo '<link rel="stylesheet" href="' . asset('/__assets__/style.css') . '?v=' . filemtime(__DIR__ . '/style.css') . '">';
+    // Публичные стили перенесены в /assets/style.css и обслуживаются под префиксом /__assets__
+    echo '<link rel="stylesheet" href="' . asset('/__assets__/assets/style.css') . '?v=' . filemtime(__DIR__ . '/assets/style.css') . '">';
     echo '<script src="' . asset('/__assets__/app.js') . '?v=' . filemtime(__DIR__ . '/app.js') . '" defer></script>';
     echo '</head><body class="theme-light">';
     if ($with_topbar) {
@@ -352,8 +353,17 @@ function render_admin_page(): void {
     // Админка: без верхней панели и переключателя темы, всегда светлая тема
     render_header('Админ-панель', false);
     echo '<main class="container admin">';
+    // Подключаем изолированные стили админки
+    echo '<link rel="stylesheet" href="' . asset('/__assets__/bod/admin-style.css') . '?v=' . filemtime(__DIR__ . '/bod/admin-style.css') . '">';
     echo '<div id="adminApp"></div>';
-    echo '<script src="' . asset('/crud.php') . '?action=admin_js"></script>';
+    // Прокидываем базовый путь приложения в JS, чтобы API-запросы шли корректно и в поддиректориях
+    $base = rtrim(str_replace('\\','/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+    $base = ($base === '' || $base === '/') ? '' : $base;
+    echo '<script>window.ADMIN_BASE = ' . json_encode($base) . ';</script>';
+    // Подключаем модуль редактора до основного бандла админки
+    echo '<script src="' . asset('/__assets__/bod/editor.js') . '?v=' . filemtime(__DIR__ . '/bod/editor.js') . '"></script>';
+    // Подключаем статический бандл админки, вынесенный из crud.php
+    echo '<script src="' . asset('/__assets__/bod/bod.js') . '?v=' . filemtime(__DIR__ . '/bod/bod.js') . '"></script>';
     echo '</main>';
     render_footer();
 }
