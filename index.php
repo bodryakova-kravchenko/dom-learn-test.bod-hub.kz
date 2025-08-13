@@ -303,10 +303,10 @@ function render_header(string $title, bool $with_topbar = true): void {
     echo '<!doctype html><html lang="ru"><head>';
     echo '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>' . e($title) . ' — DOMLearn</title>';
-    echo '<link rel="icon" href="' . asset('/__assets__/images/favicon.ico') . '" type="image/x-icon">';
-    // Публичные стили перенесены в /assets/style.css и обслуживаются под префиксом /__assets__
-    echo '<link rel="stylesheet" href="' . asset('/__assets__/assets/style.css') . '?v=' . filemtime(__DIR__ . '/assets/style.css') . '">';
-    echo '<script src="' . asset('/__assets__/app.js') . '?v=' . filemtime(__DIR__ . '/app.js') . '" defer></script>';
+    echo '<link rel="icon" href="' . asset('/images/favicon.ico') . '" type="image/x-icon">';
+    // Публичные стили подключаем напрямую из /assets/style.css, чтобы работало без mod_rewrite
+    echo '<link rel="stylesheet" href="' . asset('/assets/style.css') . '?v=' . filemtime(__DIR__ . '/assets/style.css') . '">';
+    echo '<script src="' . asset('/app.js') . '?v=' . filemtime(__DIR__ . '/app.js') . '" defer></script>';
     echo '</head><body class="theme-light">';
     if ($with_topbar) {
         echo '<header class="topbar">';
@@ -354,15 +354,15 @@ function render_admin_page(): void {
     render_header('Админ-панель', false);
     echo '<main class="container admin">';
     // Подключаем изолированные стили админки
-    echo '<link rel="stylesheet" href="' . asset('/__assets__/bod/admin-style.css') . '?v=' . filemtime(__DIR__ . '/bod/admin-style.css') . '">';
+    echo '<link rel="stylesheet" href="' . asset('/bod/admin-style.css') . '?v=' . filemtime(__DIR__ . '/bod/admin-style.css') . '">';
     // Прокидываем базовый путь приложения через data-атрибут у контейнера
     $base = rtrim(str_replace('\\','/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
     $base = ($base === '' || $base === '/') ? '' : $base;
     echo '<div id="adminApp" data-admin-base="' . e($base) . '"></div>';
     // Подключаем модуль редактора до основного бандла админки
-    echo '<script src="' . asset('/__assets__/bod/editor.js') . '?v=' . filemtime(__DIR__ . '/bod/editor.js') . '"></script>';
+    echo '<script src="' . asset('/bod/editor.js') . '?v=' . filemtime(__DIR__ . '/bod/editor.js') . '"></script>';
     // Подключаем статический бандл админки, вынесенный из crud.php
-    echo '<script src="' . asset('/__assets__/bod/bod.js') . '?v=' . filemtime(__DIR__ . '/bod/bod.js') . '"></script>';
+    echo '<script src="' . asset('/bod/bod.js') . '?v=' . filemtime(__DIR__ . '/bod/bod.js') . '"></script>';
     echo '</main>';
     render_footer();
 }

@@ -1,0 +1,10 @@
+<?php
+// bod/index.php — точка входа админ-панели без mod_rewrite
+// Быстрый обход: прокручиваем основной index.php как будто запрос пришёл на /bod
+// И одновременно нормализуем SCRIPT_NAME, чтобы базовый путь считался корнем сайта
+
+// Притворяемся, что фронт-контроллер — /index.php и маршрут — /bod
+$_SERVER['REQUEST_URI'] = '/bod';
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+
+require_once __DIR__ . '/../index.php';
