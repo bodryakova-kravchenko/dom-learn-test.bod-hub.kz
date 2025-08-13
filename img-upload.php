@@ -70,8 +70,8 @@ function api_upload_image(): void {
 
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file['tmp_name']);
-    $allowedMime = $mc['allowed_mime'] ?? ['image/png','image/jpeg','image/webp','image/gif'];
-    $allowedExt  = $mc['allowed_ext']  ?? ['png','jpg','jpeg','webp','gif'];
+    $allowedMime = $mc['allowed_mime'] ?? ['image/png','image/jpeg','image/webp'];
+    $allowedExt  = $mc['allowed_ext']  ?? ['png','jpg','jpeg','webp'];
     if (!in_array($mime, $allowedMime, true)) {
         http_response_code(400);
         header('Content-Type: application/json');
@@ -84,7 +84,7 @@ function api_upload_image(): void {
     if ($ext === 'jpeg') { $ext = 'jpg'; }
     if (!in_array($ext, $allowedExt, true)) {
         // Фоллбек по MIME
-        $map = ['image/png'=>'png','image/jpeg'=>'jpg','image/webp'=>'webp','image/gif'=>'gif'];
+        $map = ['image/png'=>'png','image/jpeg'=>'jpg','image/webp'=>'webp'];
         $ext = $map[$mime] ?? 'png';
     }
 

@@ -504,8 +504,6 @@
           row.appendChild(rb); row.appendChild(inp); answersWrap.appendChild(row);
         }
 
-        function renumberAnswers(){ /* индексация не требуется при фиксированных 4 вариантах */ }
-
         // Кнопки добавления/удаления ответов убраны — всегда 4 варианта
 
         // Кнопки управления вопросом

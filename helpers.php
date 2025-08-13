@@ -7,7 +7,6 @@
  * - asset(): построение URL для ассетов с учётом base_path
  * - json_response(): единый JSON-ответ API
  * - validate_slug(): обёртка над db_validate_slug() из db-api.php
- * - rrmdir(): рекурсивное удаление директории (для служебных задач)
  */
 
 declare(strict_types=1);
@@ -45,14 +44,4 @@ function validate_slug(string $slug): bool {
     return db_validate_slug($slug);
 }
 
-/** Рекурсивное удаление директории (осторожно) */
-function rrmdir(string $dir): void {
-    if (!is_dir($dir)) return;
-    $items = scandir($dir);
-    foreach ($items as $it) {
-        if ($it === '.' || $it === '..') continue;
-        $path = $dir . DIRECTORY_SEPARATOR . $it;
-        if (is_dir($path)) rrmdir($path); else @unlink($path);
-    }
-    @rmdir($dir);
-}
+// rrmdir() удалён как неиспользуемый дубликат (см. db-api.php::db_rrmdir)
