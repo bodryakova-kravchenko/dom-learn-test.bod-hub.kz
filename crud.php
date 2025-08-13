@@ -65,14 +65,17 @@ function db_get_prev_next_lesson(int $section_id, int $order): array {
 }
 
 // ================== API (минимум для начала) ==================
-
-$action = $_GET['action'] ?? '';
-if ($action !== '') {
-    // Проксируем все API-запросы на api.php, сохраняя метод и тело (HTTP 307)
-    $url = base_path_crud() . '/api.php?action=' . rawurlencode($action);
-    http_response_code(307);
-    header('Location: ' . $url);
-    exit;
+// ВНИМАНИЕ: следующий блок должен выполняться только если crud.php запущен как основной скрипт,
+// а НЕ когда он подключён из api.php. Иначе возникнет 307-редирект на самого себя (петля).
+if (realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME'] ?? '')) {
+    $action = $_GET['action'] ?? '';
+    if ($action !== '') {
+        // Проксируем все API-запросы на api.php, сохраняя метод и тело (HTTP 307)
+        $url = base_path_crud() . '/api.php?action=' . rawurlencode($action);
+        http_response_code(307);
+        header('Location: ' . $url);
+        exit;
+    }
 }
 
 // ================== Вспомогательные общие функции API/CRUD ==================
