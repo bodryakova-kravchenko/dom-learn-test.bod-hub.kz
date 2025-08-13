@@ -87,7 +87,8 @@ switch ($action) {
         exit;
 
     case 'session_ok':
-        if (is_admin_authenticated()) { json_response(['ok'=>true]); } else { http_response_code(401); json_response(['ok'=>false]); }
+        // Возвращаем 200 всегда, чтобы не засорять консоль 401 при первой загрузке
+        json_response(['ok' => is_admin_authenticated() ? true : false]);
         exit;
 
     default:

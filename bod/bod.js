@@ -40,9 +40,10 @@
     var msg = h('div', {class: 'admin-msg'});
 
     // Если есть сессионная авторизация — сразу в панель
-    fetch(u('/api.php?action=session_ok')).then(function(r){ if(r.ok) return r.json(); throw 0; }).then(function(){ mountPanel(); }).catch(function(){
-      // Если включён флаг remember — после логина не разлогинивать на перезагрузках
-    });
+    fetch(u('/api.php?action=session_ok'), { credentials: 'same-origin' })
+      .then(function(r){ return r.json(); })
+      .then(function(json){ if (json && json.ok) { mountPanel(); } })
+      .catch(function(){ /* игнор: покажем форму логина */ });
 
     f.addEventListener('submit', function(ev){
       ev.preventDefault();
