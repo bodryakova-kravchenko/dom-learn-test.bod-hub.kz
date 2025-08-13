@@ -1,11 +1,18 @@
 // bod/bod.js — Админ-панель (вынесено из crud.php: admin_js_bundle)
 // Русские комментарии сохранены. Этот файл загружается статически через /__assets__/bod/bod.js
-// Ожидает, что index.php установит window.ADMIN_BASE — базовый путь приложения (например, пустая строка или "/subdir").
+// Ожидает, что index.php проставит data-admin-base на #adminApp (фолбэк: window.ADMIN_BASE)
 (function(){
   'use strict';
 
   // Базовый путь, прокинутый с сервера через index.php
-  var BASE = (typeof window !== 'undefined' && typeof window.ADMIN_BASE === 'string') ? window.ADMIN_BASE : '';
+  var BASE = (function(){
+    try{
+      var el = (typeof document!=='undefined') ? document.getElementById('adminApp') : null;
+      if (el && el.dataset && typeof el.dataset.adminBase === 'string') return el.dataset.adminBase;
+    }catch(e){}
+    if (typeof window !== 'undefined' && typeof window.ADMIN_BASE === 'string') return window.ADMIN_BASE;
+    return '';
+  })();
   function u(p){ return (BASE ? BASE : '') + p; }
 
   var LS_REMEMBER = 'domlearn-remember';

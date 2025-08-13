@@ -4,8 +4,16 @@
 (function(){
   'use strict';
 
-  // Базовый путь от сервера
-  var BASE = (typeof window !== 'undefined' && typeof window.ADMIN_BASE === 'string') ? window.ADMIN_BASE : '';
+  // Базовый путь от сервера: читаем из data-атрибута контейнера adminApp
+  var BASE = (function(){
+    try{
+      var el = (typeof document!=='undefined') ? document.getElementById('adminApp') : null;
+      if (el && el.dataset && typeof el.dataset.adminBase === 'string') return el.dataset.adminBase;
+    }catch(e){}
+    // Фолбэк на window.ADMIN_BASE (на случай старых страниц)
+    if (typeof window !== 'undefined' && typeof window.ADMIN_BASE === 'string') return window.ADMIN_BASE;
+    return '';
+  })();
   function u(p){ return (BASE ? BASE : '') + p; }
   function api(url, opt){ if (typeof url==='string' && url.charAt(0)==='/') url = u(url); opt = opt||{}; return fetch(url, opt).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }); }
 

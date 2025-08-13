@@ -355,11 +355,10 @@ function render_admin_page(): void {
     echo '<main class="container admin">';
     // Подключаем изолированные стили админки
     echo '<link rel="stylesheet" href="' . asset('/__assets__/bod/admin-style.css') . '?v=' . filemtime(__DIR__ . '/bod/admin-style.css') . '">';
-    echo '<div id="adminApp"></div>';
-    // Прокидываем базовый путь приложения в JS, чтобы API-запросы шли корректно и в поддиректориях
+    // Прокидываем базовый путь приложения через data-атрибут у контейнера
     $base = rtrim(str_replace('\\','/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
     $base = ($base === '' || $base === '/') ? '' : $base;
-    echo '<script>window.ADMIN_BASE = ' . json_encode($base) . ';</script>';
+    echo '<div id="adminApp" data-admin-base="' . e($base) . '"></div>';
     // Подключаем модуль редактора до основного бандла админки
     echo '<script src="' . asset('/__assets__/bod/editor.js') . '?v=' . filemtime(__DIR__ . '/bod/editor.js') . '"></script>';
     // Подключаем статический бандл админки, вынесенный из crud.php
