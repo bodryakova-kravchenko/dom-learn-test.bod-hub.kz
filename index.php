@@ -34,7 +34,7 @@ if ($uri === '/favicon.ico') {
     $fav = __DIR__ . '/images/favicon.ico';
     if (is_file($fav)) {
         header('Content-Type: image/x-icon');
-        header('Cache-Control: public, max-age=604800'); // 7 days
+        header('Cache-Control: public, max-age=604800'); // 7 дней
         readfile($fav);
     } else {
         http_response_code(404);

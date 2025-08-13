@@ -693,7 +693,7 @@
     });
 
     // Отключаем закрытие по клику вне окна: модалка закрывается только кнопкой/крестиком
-    dlg.addEventListener('click', function(e){ /* backdrop click disabled */ });
+    dlg.addEventListener('click', function(e){ /* отключено закрытие по клику по подложке */ });
   }
 
   // Инициализация

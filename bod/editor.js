@@ -361,7 +361,7 @@
         .catch(function(e){ if(e && e.message==='Неверный slug') return; alert('Ошибка: '+e.message); });
     });
 
-    dlg.addEventListener('click', function(e){ /* backdrop click disabled */ });
+    dlg.addEventListener('click', function(e){ /* отключено закрытие по клику по подложке */ });
   }
 
   window.AdminEditor = { openLessonEditor: openLessonEditor };

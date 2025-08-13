@@ -196,118 +196,52 @@ body.theme-dark .answer.wrong{
 
 .lesson-nav{ display:grid; grid-auto-flow: column; gap:12px; justify-content:start; }
 
-.footer{ margin-top:40px; padding:20px 0; border-top:1px solid var(--border); color:var(--muted); }
+  .footer{ margin-top:40px; padding:20px 0; border-top:1px solid var(--border); color:var(--muted); }
 
-/* Админка */
-.admin{ margin-top: 5vh; }
-.admin .admin-bar{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px; }
-.admin .admin-bar button{ justify-self: end; max-width: 220px; }
-/* Контейнер с кнопками действий справа */
-.admin .admin-bar .actions{ display:flex; align-items:center; gap:2vw; }
-/* Выравниваем высоту ссылок и кнопок */
-.admin .admin-bar .btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:10px 14px; /* синхронизировано с .btn */
-  min-height:42px;   /* одинаковая визуальная высота */
-}
-/* Размер текста: делаем кнопку Выйти такой же, как у ссылки Перейти на сайт */
-.admin .admin-bar button.btn{ font-size: inherit; }
-.admin .admin-login{ display:grid; gap:12px; max-width:420px; margin-top:12px; }
-.admin .admin-login form{ display:grid; gap:10px; }
-.admin .admin-login input[type="text"],
-.admin .admin-login input[type="password"],
-.admin .admin-login button{
-  font-size: 2rem;          /* в 2 раза больше текущего */
-  width: 80%;               /* немного меньше по ширине */
-}
-.admin .admin-msg{ color:#dc2626; }
-
-/* Admin shell */
-.admin .admin-shell{ display:grid; grid-template-columns: 1fr 2fr; gap:20px; margin-top:14px; }
-.admin .admin-left, .admin .admin-right{ background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; box-shadow: var(--shadow); }
-.admin .head{ font-weight:600; margin-bottom:10px; }
-.admin .level-tabs{ display:grid; grid-auto-flow: column; gap:8px; margin-bottom:8px; }
-.admin .level-tabs .tab{ border:1px solid var(--border); background:var(--bg); border-radius:8px; padding:6px 10px; cursor:pointer; }
-.admin .level-tabs .tab:hover{ background:var(--primary-weak); border-color:var(--primary); }
-.admin .list{ list-style:none; padding:0; margin:10px 0 0; display:grid; gap:8px; }
-.admin .item{ display:grid; grid-template-columns: 1fr auto auto; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:var(--bg); }
-.admin .item a{ color:var(--fg); text-decoration:none; }
-.admin .item a:hover{ color:var(--primary); }
-.admin .sm{ border:1px solid var(--border); background:var(--card); border-radius:8px; padding:4px 8px; cursor:pointer; }
-.admin .sm:hover{ background:var(--primary-weak); border-color:var(--primary); }
-
-/* Modal */
-.modal{ position:fixed; inset:0; background: rgba(0,0,0,.4); display:grid; place-items:center; z-index:1000; }
-.modal-box{ width:min(900px, 92vw); max-height:90vh; overflow:auto; background:var(--bg); color:var(--fg); border-radius:14px; border:1px solid var(--border); box-shadow: var(--shadow); padding:16px; position:relative; }
-.form{ display:grid; gap:10px; }
-.form input[type="text"], .form input[type="password"], .form textarea{ width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--fg); }
-.form textarea{ min-height:120px; }
-.form .row{ display:grid; grid-template-columns: auto auto auto 1fr auto; align-items:center; gap:8px; margin-top:6px; }
-.form .status{ color: #16a34a; }
-
-/* Modal close button */
-.modal-close{
-  position:absolute;
-  top:8px;
-  right:8px;
-  background:transparent;
-  border:none;
-  font-size:18px;
-  line-height:1;
-  cursor:pointer;
-  color: var(--muted);
-}
-.modal-close:hover{ color: var(--fg); background: var(--card); border-radius:6px; }
 
 /* ===========================
    Адаптив по брейкпойнтам ТЗ
    =========================== */
-/* Smartphones: <=720px */
-@media (max-width: 720px){
-  /* Admin layout simplifications */
-  .admin .admin-shell{ grid-template-columns: 1fr; }
-  .form .row{ grid-template-columns: auto 1fr; grid-auto-flow: row; }
 
-  /* Public UI adjustments */
+/* Смартфоны: <=720px */
+@media (max-width: 720px){
+
+  /* Настройки публичного интерфейса */
   .grid.cards{ grid-template-columns: 1fr; }
   .lesson-nav{ grid-auto-flow: row; }
   .section-list{ grid-template-columns: 1fr; }
 
-  /* Tests spacing and touch targets */
+  /* Отступы и удобные цели для тестов */
   .tests{ gap: 10px; }
   .tests .answers{ gap: 10px; }
   .tests .test-question{ padding: 10px; border-radius: 10px; }
   .answer{ padding: 12px 14px; font-size: 16px; }
 
-  /* Cards and admin tweaks */
+  /* Карточки и правки админки */
   .card{ padding: 14px; }
   .level-card{ padding: 14px; }
   .section-card{ padding: 12px; }
   .lesson-list{ gap: 10px; }
   .section-list{ gap: 10px; }
   .grid.cards{ gap: 12px; }
-  .modal-box{ padding: 12px; }
-  .admin .item{ padding: 8px 10px; }
+  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
 }
 
-/* Tablets: 721–1280px */
+/* Планшеты: 721–1280px */
 @media (min-width: 721px) and (max-width: 1280px){
-  /* Tablet-specific spacing for tests */
+  /* Планшеты: отступы для тестов */
   .tests{ gap: 14px; }
   .tests .test-question{ padding: 12px; border-radius: 12px; }
-  
-  /* Admin: switch to single column up to 1280px */
-  .admin .admin-shell{ grid-template-columns: 1fr; }
+  /* Админка: правила перенесены в bod/admin-style.css */
 
-  /* Cards and admin tweaks */
+  /* Карточки и правки админки */
   .card{ padding: 16px; }
   .level-card{ padding: 16px; }
   .section-card{ padding: 14px; }
   .grid.cards{ gap: 14px; }
   .section-list{ gap: 12px; }
   .lesson-list{ gap: 10px; }
-  .modal-box{ padding: 14px; }
-  .admin .item{ padding: 10px 12px; }
+  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
 }
 
 /* Notebooks: 1281–1600px — правила выше для .tests */
@@ -318,8 +252,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 16px; }
   .section-list{ gap: 14px; }
   .lesson-list{ gap: 10px; }
-  .modal-box{ padding: 16px; }
-  .admin .item{ padding: 11px 13px; }
+  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
 }
 
 /* Monitors: 1601–1920px — правила выше для .tests */
@@ -330,8 +263,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 18px; }
   .section-list{ gap: 16px; }
   .lesson-list{ gap: 12px; }
-  .modal-box{ padding: 18px; }
-  .admin .item{ padding: 12px 14px; }
+  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
 }
 
 /* Large: 1921+ — правила выше для .tests */
@@ -342,8 +274,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 20px; }
   .section-list{ gap: 18px; }
   .lesson-list{ gap: 14px; }
-  .modal-box{ padding: 20px; }
-  .admin .item{ padding: 14px 16px; }
+  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
 }
 
 /* ============================

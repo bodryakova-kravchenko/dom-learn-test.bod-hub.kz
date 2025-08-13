@@ -227,10 +227,10 @@ function db_lesson_save(array $data): array {
 /** Удалить урок и его папку изображений */
 function db_lesson_delete(int $id): void {
     if ($id <= 0) throw new RuntimeException('id required');
-    // legacy images path
+    // Старый путь к изображениям (legacy)
     $legacy = __DIR__ . '/images/lesson_' . $id;
     if (is_dir($legacy)) db_rrmdir($legacy);
-    // new uploads path
+    // Новый путь для загрузок (uploads)
     $sl = db_slugs_by_lesson_id($id);
     if ($sl) {
         $mc = media_config();

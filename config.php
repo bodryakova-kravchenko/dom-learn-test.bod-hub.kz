@@ -133,8 +133,8 @@ function media_config(): array {
     $maxBytes = max(1, $maxMb) * 1024 * 1024;
     return [
         'root' => $root,
-        'images_dir' => $imagesDir,   // legacy
-        'uploads_dir' => $uploadsDir, // new
+        'images_dir' => $imagesDir,   // старый каталог (legacy)
+        'uploads_dir' => $uploadsDir, // новый каталог (uploads)
         'max_bytes' => $maxBytes,
         'allowed_ext' => ['png','jpg','jpeg','webp','gif'],
         'allowed_mime' => ['image/png','image/jpeg','image/webp','image/gif'],
