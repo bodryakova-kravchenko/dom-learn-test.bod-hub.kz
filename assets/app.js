@@ -12,7 +12,8 @@
         document.body.classList.remove('theme-dark','theme-light');
         document.body.classList.add(saved);
       }
-    } catch (e) {}
+    } catch (e) {
+    }
     // Theme toggle
     var btn = document.getElementById('themeToggle');
     if (btn) {
@@ -21,7 +22,10 @@
         var next = cur === 'theme-dark' ? 'theme-light' : 'theme-dark';
         document.body.classList.remove('theme-dark','theme-light');
         document.body.classList.add(next);
-        try { localStorage.setItem(KEY, next); } catch (e) {}
+        try {
+          localStorage.setItem(KEY, next);
+        } catch (e) {
+        }
       });
     }
 
@@ -35,8 +39,14 @@
           answered = true;
           var idx = parseInt(btn.dataset.idx,10);
           qEl.querySelectorAll('.answer').forEach(function(b, j){
-            if (j === correct) { b.classList.add('correct'); b.textContent = '✔ ' + b.textContent; }
-            if (j === idx && j !== correct) { b.classList.add('wrong'); b.textContent = '✘ ' + b.textContent; }
+            if (j === correct) {
+              b.classList.add('correct');
+              b.textContent = '✔ ' + b.textContent;
+            }
+            if (j === idx && j !== correct) {
+              b.classList.add('wrong');
+              b.textContent = '✘ ' + b.textContent;
+            }
             b.disabled = true;
           });
         });

@@ -41,12 +41,22 @@
     var taTasks = document.createElement('textarea'); taTasks.placeholder='Задачи (JSON массив объектов)'; taTasks.value = JSON.stringify((ls.content&&ls.content.tasks)||[], null, 2); f.appendChild(taTasks);
 
     // Статусы рядом с кнопками, автоисчезновение 5 сек
-    var row = document.createElement('div'); row.className='row';
-    var btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent='💾 Сохранить черновик';
-    var status1 = document.createElement('span'); status1.className='status';
-    var btnPub = document.createElement('button'); btnPub.type='button'; btnPub.textContent='📢 Опубликовать';
-    var status2 = document.createElement('span'); status2.className='status';
-    row.appendChild(btnSave); row.appendChild(status1); row.appendChild(btnPub); row.appendChild(status2);
+    var row = document.createElement('div');
+    row.className = 'row';
+    var btnSave = document.createElement('button');
+    btnSave.type = 'button';
+    btnSave.textContent = '💾 Сохранить черновик';
+    var status1 = document.createElement('span');
+    status1.className = 'status';
+    var btnPub = document.createElement('button');
+    btnPub.type = 'button';
+    btnPub.textContent = '📢 Опубликовать';
+    var status2 = document.createElement('span');
+    status2.className = 'status';
+    row.appendChild(btnSave);
+    row.appendChild(status1);
+    row.appendChild(btnPub);
+    row.appendChild(status2);
     // Кнопка "Закрыть" справа от "Опубликовать"
     var btnCloseForm = document.createElement('button'); btnCloseForm.type='button'; btnCloseForm.textContent='Закрыть';
     btnCloseForm.addEventListener('click', function(){ dlg.remove(); });
@@ -133,8 +143,10 @@
     });
 
     // --- Конструктор тестов и задач ---
-    var testsBuilderWrap = document.createElement('div'); testsBuilderWrap.className = 'builder tests-builder';
-    var tasksBuilderWrap = document.createElement('div'); tasksBuilderWrap.className = 'builder tasks-builder';
+    var testsBuilderWrap = document.createElement('div');
+    testsBuilderWrap.className = 'builder tests-builder';
+    var tasksBuilderWrap = document.createElement('div');
+    tasksBuilderWrap.className = 'builder tasks-builder';
 
     // Хранилища инстансов редакторов
     var testsEditors = [];
@@ -151,23 +163,51 @@
 
       function addQuestion(q){
         var qid = uid();
-        var item = document.createElement('div'); item.className='item'; item.dataset.qid = qid;
-        var qLabel = document.createElement('div'); qLabel.textContent = 'Текст вопроса:'; item.appendChild(qLabel);
-        var qArea = document.createElement('div'); qArea.setAttribute('contenteditable','true'); qArea.style.minHeight='80px'; qArea.style.border='1px solid #ccc'; qArea.style.padding='6px'; item.appendChild(qArea);
-        var answersWrap = document.createElement('div'); answersWrap.className='answers-list'; item.appendChild(answersWrap);
-        var ansLabel = document.createElement('div'); ansLabel.textContent='Ответы (выберите правильный):'; item.insertBefore(ansLabel, answersWrap);
+        var item = document.createElement('div');
+        item.className = 'item';
+        item.dataset.qid = qid;
+        var qLabel = document.createElement('div');
+        qLabel.textContent = 'Текст вопроса:';
+        item.appendChild(qLabel);
+        var qArea = document.createElement('div');
+        qArea.setAttribute('contenteditable','true');
+        qArea.style.minHeight = '80px';
+        qArea.style.border = '1px solid #ccc';
+        qArea.style.padding = '6px';
+        item.appendChild(qArea);
+        var answersWrap = document.createElement('div');
+        answersWrap.className = 'answers-list';
+        item.appendChild(answersWrap);
+        var ansLabel = document.createElement('div');
+        ansLabel.textContent = 'Ответы (выберите правильный):';
+        item.insertBefore(ansLabel, answersWrap);
 
         function addAnswerRow(val, idx, correctIdx){
-          var row = document.createElement('div'); row.className='answer-row';
-          var rb = document.createElement('input'); rb.type='radio'; rb.name='correct-'+qid; rb.value=String(idx);
-          if (typeof correctIdx==='number' && correctIdx===idx) rb.checked = true;
-          var inp = document.createElement('input'); inp.type='text'; inp.placeholder='Ответ'; inp.value = val||'';
-          row.appendChild(rb); row.appendChild(inp); answersWrap.appendChild(row);
+          var row = document.createElement('div');
+          row.className = 'answer-row';
+          var rb = document.createElement('input');
+          rb.type = 'radio';
+          rb.name = 'correct-' + qid;
+          rb.value = String(idx);
+          if (typeof correctIdx === 'number' && correctIdx === idx) {
+            rb.checked = true;
+          }
+          var inp = document.createElement('input');
+          inp.type = 'text';
+          inp.placeholder = 'Ответ';
+          inp.value = val || '';
+          row.appendChild(rb);
+          row.appendChild(inp);
+          answersWrap.appendChild(row);
         }
 
         var Ctor = getClassicCtor();
         function initQ(){
-          var C = getClassicCtor(); if(!C){ console.warn('CKE not ready for tests'); return; }
+          var C = getClassicCtor(); 
+          if(!C){ 
+            console.warn('CKE not ready for tests'); 
+            return; 
+          }
           C.create(qArea, {
             toolbar: { items: ['heading','|','bold','italic','link','fontColor','|','alignment','|','imageUpload','blockQuote','|','undo','redo'] },
             removePlugins: [
@@ -191,7 +231,9 @@
         var answers = (q && Array.isArray(q.answers)) ? q.answers.slice(0,4) : [];
         while (answers.length < 4) answers.push('');
         var corr = (q && typeof q.correctIndex==='number') ? q.correctIndex : -1;
-        answers.forEach(function(a,i){ addAnswerRow(a, i, corr); });
+        answers.forEach(function(a,i){
+          addAnswerRow(a, i, corr);
+        });
       }
 
       addBtn.addEventListener('click', function(){ addQuestion({answers:['',''], correctIndex:-1}); });
@@ -246,21 +288,40 @@
 
       function addTask(t){
         var tid = uid();
-        var item = document.createElement('div'); item.className='item'; item.dataset.tid = tid;
-        var titleIn = document.createElement('input'); titleIn.type='text'; titleIn.placeholder='Заголовок'; titleIn.value = (t&&t.title)||'';
-        var titleLabel = document.createElement('label'); titleLabel.textContent='Заголовок задачи: ';
-        titleLabel.appendChild(titleIn); item.appendChild(titleLabel);
-        var bodyLabel = document.createElement('div'); bodyLabel.textContent='Текст задачи:'; item.appendChild(bodyLabel);
-        var body = document.createElement('div'); body.setAttribute('contenteditable','true'); body.style.minHeight='100px'; body.style.border='1px solid #ccc'; body.style.padding='6px'; item.appendChild(body);
+        var item = document.createElement('div');
+        item.className = 'item';
+        item.dataset.tid = tid;
+        var titleIn = document.createElement('input');
+        titleIn.type = 'text';
+        titleIn.placeholder = 'Заголовок';
+        titleIn.value = (t && t.title) || '';
+        var titleLabel = document.createElement('label');
+        titleLabel.textContent = 'Заголовок задачи: ';
+        titleLabel.appendChild(titleIn);
+        item.appendChild(titleLabel);
+        var bodyLabel = document.createElement('div');
+        bodyLabel.textContent = 'Текст задачи:';
+        item.appendChild(bodyLabel);
+        var body = document.createElement('div');
+        body.setAttribute('contenteditable','true');
+        body.style.minHeight = '100px';
+        body.style.border = '1px solid #ccc';
+        body.style.padding = '6px';
+        item.appendChild(body);
 
-        var tools = document.createElement('div'); tools.className='row';
-        var delT = document.createElement('button'); delT.type='button'; delT.className='btn-small'; delT.textContent='Удалить задачу';
+        var tools = document.createElement('div');
+        tools.className = 'row';
+        var delT = document.createElement('button');
+        delT.type = 'button';
+        delT.className = 'btn-small';
+        delT.textContent = 'Удалить задачу';
         delT.addEventListener('click', function(){
           var recIdx = tasksEditors.findIndex(function(r){ return r.tid===tid; });
           if(recIdx>=0){ try{ tasksEditors[recIdx].editor.destroy(); }catch(e){} tasksEditors.splice(recIdx,1); }
           item.remove();
         });
-        tools.appendChild(delT); item.appendChild(tools);
+        tools.appendChild(delT);
+        item.appendChild(tools);
 
         list.appendChild(item);
 

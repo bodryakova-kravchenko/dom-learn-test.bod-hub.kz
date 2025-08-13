@@ -19,7 +19,15 @@
 
   function h(tag, attrs){
     var el = document.createElement(tag);
-    if (attrs) for (var k in attrs){ if (k==='text') el.textContent=attrs[k]; else el.setAttribute(k, attrs[k]); }
+    if (attrs) {
+      for (var k in attrs) {
+        if (k === 'text') {
+          el.textContent = attrs[k];
+        } else {
+          el.setAttribute(k, attrs[k]);
+        }
+      }
+    }
     return el;
   }
 
@@ -30,13 +38,19 @@
     var wrap = h('div', {class: 'admin-login'});
     var title = h('h2', {text: 'Вход в админ-панель'});
     var f = h('form');
-    var login = h('input'); login.type='text'; login.placeholder='Логин';
-    var pass = h('input'); pass.type='password'; pass.placeholder='Пароль';
+    var login = h('input'); 
+    login.type='text'; 
+    login.placeholder='Логин';
+    var pass = h('input');
+    pass.type = 'password';
+    pass.placeholder = 'Пароль';
     var rememberLbl = h('label');
-    var remember = h('input'); remember.type='checkbox';
+    var remember = h('input');
+    remember.type = 'checkbox';
     rememberLbl.appendChild(remember);
     rememberLbl.appendChild(document.createTextNode(' Запомнить меня'));
-    var btn = h('button', {text: 'Войти'}); btn.type='submit';
+    var btn = h('button', {text: 'Войти'});
+    btn.type = 'submit';
     var msg = h('div', {class: 'admin-msg'});
 
     // Если есть сессионная авторизация — сразу в панель
@@ -51,7 +65,14 @@
       var p = pass.value;
       fetch(u('/api.php?action=ping_login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({l:l,p:p}), credentials: 'same-origin'})
         .then(function(r){ if(!r.ok) throw new Error('Неверный логин или пароль'); return r.json(); })
-        .then(function(){ try{ if(remember.checked){ localStorage.setItem(LS_REMEMBER,'1'); } }catch(e){}; mountPanel(); })
+        .then(function(){
+          try {
+            if (remember.checked) {
+              localStorage.setItem(LS_REMEMBER,'1');
+            }
+          } catch(e) {}
+          mountPanel();
+        })
         .catch(function(e){ msg.textContent = (e && e.message) ? e.message : 'Ошибка авторизации'; });
     });
 
@@ -70,15 +91,23 @@
     return fetch(url, opt).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
   }
 
-  function el(tag, cls, txt){ var x=document.createElement(tag); if(cls) x.className=cls; if(txt) x.textContent=txt; return x; }
+  function el(tag, cls, txt){
+    var x = document.createElement(tag);
+    if (cls) x.className = cls;
+    if (txt) x.textContent = txt;
+    return x;
+  }
 
   function mountPanel(openSectionId){
     var root = document.getElementById('adminApp');
     root.innerHTML = '';
     var bar = h('div', {class:'admin-bar'});
     // Кнопки управления (справа): Перейти на сайт и Выйти
-    var visit = h('a', {text:'Перейти на сайт'}); visit.href = u('/'); visit.className = 'btn';
-    var logout = h('button', {text:'Выйти'}); logout.className = 'btn';
+    var visit = h('a', {text:'Перейти на сайт'});
+    visit.href = u('/');
+    visit.className = 'btn';
+    var logout = h('button', {text:'Выйти'});
+    logout.className = 'btn';
     var actions = el('div','actions');
     actions.appendChild(visit);
     actions.appendChild(logout);
@@ -94,15 +123,20 @@
     var shell = el('div','admin-shell');
     var left = el('div','admin-left');
     var right = el('div','admin-right');
-    shell.appendChild(left); shell.appendChild(right);
+    shell.appendChild(left);
+    shell.appendChild(right);
 
     root.appendChild(bar);
     root.appendChild(shell);
 
     // Загрузка дерева
-    api(u('/api.php?action=tree')).then(function(data){
-      renderTree(left, right, data, openSectionId);
-    }).catch(function(err){ left.textContent = 'Ошибка загрузки: '+err.message; });
+    api(u('/api.php?action=tree'))
+      .then(function(data){
+        renderTree(left, right, data, openSectionId);
+      })
+      .catch(function(err){
+        left.textContent = 'Ошибка загрузки: '+err.message; 
+      });
   }
 
   function renderTree(left, right, data, openSectionId){
@@ -127,45 +161,83 @@
     var currentLevelIndex = 0;
     var currentSectionId = null;
 
-    function selectLevel(i){ currentLevelIndex = i; renderSections(); lessonsWrap.innerHTML=''; }
+    function selectLevel(i) {
+      currentLevelIndex = i; 
+      renderSections(); 
+      lessonsWrap.innerHTML=''; 
+    }
+    
     function renderSections(){
       sectionsWrap.innerHTML = '';
       var lv = levels[currentLevelIndex];
-      var head = el('div','head'); head.textContent = 'Разделы — '+lv.title_ru; sectionsWrap.appendChild(head);
+      var head = el('div','head');
+      head.textContent = 'Разделы — '+lv.title_ru;
+      sectionsWrap.appendChild(head);
       var addBtn = el('button','btn', '➕ Добавить раздел');
       addBtn.addEventListener('click', function(){
         var title = prompt('Название раздела (рус)'); if(!title) return;
         var slug = prompt('Slug (только a-z и -)'); if(!slug) return;
         api(u('/api.php?action=section_save'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ level_id: lv.id, title_ru: title, slug: slug })})
           .then(function(){ return api(u('/api.php?action=tree')); })
-          .then(function(d){ data=d; levels=d.levels||[]; renderSections(); lessonsWrap.innerHTML=''; })
+          .then(function(d){
+            data = d;
+            levels = d.levels || [];
+            renderSections();
+            lessonsWrap.innerHTML = '';
+          })
           .catch(function(e){ alert('Ошибка: '+e.message); });
       });
       sectionsWrap.appendChild(addBtn);
 
-      var ul = el('ul','list'); ul.setAttribute('data-level', lv.id);
+      var ul = el('ul','list');
+      ul.setAttribute('data-level', lv.id);
       (lv.sections||[]).forEach(function(sec){
-        var li = el('li','item'); li.dataset.id = sec.id;
+        var li = el('li','item');
+        li.dataset.id = sec.id;
         var a = el('a',null, sec.section_order+'. '+sec.title_ru);
-        a.href='#'; a.addEventListener('click', function(ev){ ev.preventDefault(); currentSectionId=sec.id; renderLessons(sec); });
-        var edit = el('button','sm','✎'); edit.title='Редактировать';
+        a.href = '#';
+        a.addEventListener('click', function(ev){
+          ev.preventDefault();
+          currentSectionId = sec.id;
+          renderLessons(sec);
+        });
+        var edit = el('button','sm','✎');
+        edit.title = 'Редактировать';
         edit.addEventListener('click', function(){
           var title = prompt('Название раздела', sec.title_ru); if(!title) return;
           var slug = prompt('Slug', sec.slug); if(!slug) return;
           api(u('/api.php?action=section_save'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: sec.id, level_id: lv.id, title_ru: title, slug: slug, section_order: sec.section_order })})
             .then(function(){ return api(u('/api.php?action=tree')); })
-            .then(function(d){ data=d; levels=d.levels||[]; renderSections(); if(currentSectionId===sec.id){ var s=findSection(sec.id); if(s) renderLessons(s); } })
+            .then(function(d){
+              data = d;
+              levels = d.levels || [];
+              renderSections();
+              if (currentSectionId === sec.id) {
+                var s = findSection(sec.id);
+                if (s) renderLessons(s);
+              }
+            })
             .catch(function(e){ alert('Ошибка: '+e.message); });
         });
-        var del = el('button','sm','🗑'); del.title='Удалить';
+        var del = el('button','sm','🗑');
+        del.title = 'Удалить';
         del.addEventListener('click', function(){
           if(!confirm('Удалить раздел и все его уроки?')) return;
           api(u('/api.php?action=section_delete'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: sec.id })})
             .then(function(){ return api(u('/api.php?action=tree')); })
-            .then(function(d){ data=d; levels=d.levels||[]; currentSectionId=null; renderSections(); lessonsWrap.innerHTML=''; })
+            .then(function(d){
+              data = d;
+              levels = d.levels || [];
+              currentSectionId = null;
+              renderSections();
+              lessonsWrap.innerHTML = '';
+            })
             .catch(function(e){ alert('Ошибка: '+e.message); });
         });
-        li.appendChild(a); li.appendChild(edit); li.appendChild(del); ul.appendChild(li);
+        li.appendChild(a);
+        li.appendChild(edit);
+        li.appendChild(del);
+        ul.appendChild(li);
       });
 
       sectionsWrap.appendChild(ul);
@@ -181,7 +253,9 @@
     // Рендер списка уроков выбранного раздела
     function renderLessons(sec){
       lessonsWrap.innerHTML = '';
-      var head = el('div','head'); head.textContent = 'Уроки — '+sec.title_ru; lessonsWrap.appendChild(head);
+      var head = el('div','head');
+      head.textContent = 'Уроки — '+sec.title_ru;
+      lessonsWrap.appendChild(head);
 
       var addBtn = el('button','btn','➕ Добавить урок');
       addBtn.addEventListener('click', function(){
@@ -198,9 +272,11 @@
       });
       lessonsWrap.appendChild(addBtn);
 
-      var ul = el('ul','list'); ul.setAttribute('data-section', sec.id);
+      var ul = el('ul','list');
+      ul.setAttribute('data-section', sec.id);
       (sec.lessons||[]).forEach(function(ls){
-        var li = el('li','item'); li.dataset.id = ls.id;
+        var li = el('li','item');
+        li.dataset.id = ls.id;
         var title = el('a', null, (ls.lesson_order||0)+'. '+ls.title_ru);
         if (ls.is_published){
           var ok = el('span', null, '✓');

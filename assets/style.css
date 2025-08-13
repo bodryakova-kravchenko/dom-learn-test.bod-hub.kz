@@ -53,53 +53,71 @@ body{
   grid-template-columns:auto 1fr auto;
   align-items:center;
   gap:12px;
-  min-height:54px;
 }
-.brand{
-  color:var(--fg);
-  text-decoration:none;
-  font-weight:700;
-  letter-spacing:.2px;
-}
-.spacer{ width:100%; }
-.icon-btn{
-  border:1px solid var(--border);
-  background:var(--bg);
-  color:var(--fg);
-  border-radius:8px;
-  padding:6px 10px;
-  cursor:pointer;
-}
-.icon-btn:hover{ background:var(--card); }
 
-h1,h2,h3{
-  line-height:1.25;
+.brand{
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.spacer{
+  width: 100%;
+}
+
+.icon-btn{
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.icon-btn:hover{
+  background: var(--card);
+}
+
+h1, h2, h3{
+  line-height: 1.25;
   margin: 1rem 0 .5rem;
 }
-.muted{ color:var(--muted); }
+
+.muted{
+  color: var(--muted);
+}
 
 .grid.cards{
-  display:grid;
-  gap:16px;
-  grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
+
 .card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
   box-shadow: var(--shadow);
 }
+
 .card h2 a, .card h3 a{
-  color:var(--fg);
-  text-decoration:none;
+  color: var(--fg);
+  text-decoration: none;
 }
-.card h2 a:hover, .card h3 a:hover{ color:var(--primary); }
-/* Smaller variant for compact lesson cards on section page */
-.card-sm{ padding:14px; }
+
+.card h2 a:hover, .card h3 a:hover{
+  color: var(--primary);
+}
+
+.card-sm{
+  padding: 14px;
+}
+
 .card-sm h3{
-  margin:0 0 6px;
-  font-size:1.05rem;
+  margin: 0 0 6px;
+  font-size: 1.05rem;
 }
 
 /* ===== Главная: уровни -> разделы -> уроки ===== */
@@ -116,7 +134,9 @@ h1,h2,h3{
   border-bottom:1px dashed var(--border);
   padding-bottom:10px;
 }
-.level-title{ margin:0; }
+.level-title{
+  margin:0;
+}
 
 .section-list{
   display:grid;
@@ -157,7 +177,9 @@ h1,h2,h3{
   color:var(--fg);
   text-decoration:none;
 }
-.lesson-link:hover{ color: var(--primary); }
+.lesson-link:hover{
+  color: var(--primary);
+}
 .lesson-link .order{
   color: var(--muted);
   margin-right:6px;
@@ -486,4 +508,7 @@ body.theme-dark .answer.wrong{
   border-radius:8px;
   cursor:pointer;
 }
-.builder .btn-small:hover{ background: var(--primary-weak); border-color: var(--primary); }
+.builder .btn-small:hover{
+  background: var(--primary-weak);
+  border-color: var(--primary);
+}
