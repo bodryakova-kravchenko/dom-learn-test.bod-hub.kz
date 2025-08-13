@@ -15,9 +15,43 @@
 
 // Включаем строгие типы и разумные настройки ошибок
 declare(strict_types=1);
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
+
+// Централизованная настройка ошибок: на проде не показываем, логируем в файл
+// Отображение ошибок выключено
+@ini_set('display_errors', '0');
+@ini_set('display_startup_errors', '0');
+// Репортим всё важное, но без шумных устаревших/строгих в проде
+@error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+// Включаем логирование
+@ini_set('log_errors', '1');
+// Путь к логу: storage/logs/app-php-error.log (создадим каталог при необходимости)
+(function(){
+    $logDir = __DIR__ . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'logs';
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0755, true);
+    }
+    $logFile = $logDir . DIRECTORY_SEPARATOR . 'app-php-error.log';
+    // Если каталог существует или успешно создан — направляем error_log туда
+    if (is_dir($logDir) && is_writable($logDir)) {
+        @ini_set('error_log', $logFile);
+        // Мини-ротация по размеру: при превышении лимита переименовываем текущий лог и создаём новый
+        $maxMb = (int) (env_get('LOG_MAX_MB', '10') ?? '10');
+        if ($maxMb < 1) { $maxMb = 10; }
+        $maxBytes = $maxMb * 1024 * 1024;
+        $size = @filesize($logFile);
+        if (is_int($size) && $size > $maxBytes) {
+            $suffix = date('Ymd-His');
+            $rotated = $logDir . DIRECTORY_SEPARATOR . 'app-php-error-' . $suffix . '.log';
+            @rename($logFile, $rotated);
+            @touch($logFile);
+            @chmod($logFile, 0644);
+        }
+    } else {
+        // Фолбэк: системный temp
+        $tmp = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'app-php-error.log';
+        @ini_set('error_log', $tmp);
+    }
+})();
 
 // Настраиваем cookie параметы для PHP-сессии ДО session_start()
 if (session_status() === PHP_SESSION_NONE) {
