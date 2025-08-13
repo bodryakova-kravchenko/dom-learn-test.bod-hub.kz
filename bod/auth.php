@@ -26,6 +26,10 @@ function admin_login(string $login, string $password): bool {
     $creds = admin_credentials();
     $ok = ($login === ($creds['login'] ?? '') && $password === ($creds['password'] ?? ''));
     if ($ok) {
+        // Перегенерируем ID сессии для безопасности и чтобы форсировать установку cookie
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            @session_regenerate_id(true);
+        }
         $_SESSION['admin_ok'] = true;
     }
     return $ok;

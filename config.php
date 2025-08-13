@@ -19,7 +19,25 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
+// Настраиваем cookie параметы для PHP-сессии ДО session_start()
 if (session_status() === PHP_SESSION_NONE) {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? '') === '443');
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    // Убираем порт из домена (если есть)
+    if (strpos($host, ':') !== false) { $host = explode(':', $host, 2)[0]; }
+    // Формируем опции cookie (PHP >= 7.3 поддерживает массив)
+    $cookieOpts = [
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => $host ?: '',
+        'secure' => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ];
+    // Применяем параметры и запускаем сессию
+    if (function_exists('session_set_cookie_params')) {
+        session_set_cookie_params($cookieOpts);
+    }
     session_start();
 }
 
