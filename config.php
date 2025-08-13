@@ -21,15 +21,13 @@ error_reporting(E_ALL);
 
 // Настраиваем cookie параметы для PHP-сессии ДО session_start()
 if (session_status() === PHP_SESSION_NONE) {
-    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? '') === '443');
-    $host = $_SERVER['HTTP_HOST'] ?? '';
-    // Убираем порт из домена (если есть)
-    if (strpos($host, ':') !== false) { $host = explode(':', $host, 2)[0]; }
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['SERVER_PORT'] ?? '') === '443')
+        || (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     // Формируем опции cookie (PHP >= 7.3 поддерживает массив)
     $cookieOpts = [
         'lifetime' => 0,
         'path' => '/',
-        'domain' => $host ?: '',
         'secure' => $isHttps,
         'httponly' => true,
         'samesite' => 'Lax',
