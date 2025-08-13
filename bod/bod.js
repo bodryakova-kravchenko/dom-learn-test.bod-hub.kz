@@ -1,5 +1,5 @@
-// bod/bod.js — Админ-панель (вынесено из crud.php: admin_js_bundle)
-// Русские комментарии сохранены. Этот файл загружается статически через /__assets__/bod/bod.js
+// Бандл админки (вынесено из crud.php: admin_js_bundle)
+// Русские комментарии сохранены. Этот файл загружается статически как часть админки
 // Ожидает, что index.php проставит data-admin-base на #adminApp (фолбэк: window.ADMIN_BASE)
 (function(){
   'use strict';

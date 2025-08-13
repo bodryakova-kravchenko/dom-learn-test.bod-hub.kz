@@ -1,4 +1,5 @@
-// bod/editor.js — Модуль редактора уроков (вынесен из bod/bod.js)
+// Модуль редактора уроков (вынесен из бандла админки)
+// Ожидает, что index.php проставит data-admin-base на #adminApp (фолбэк: window.ADMIN_BASE)
 // Экспортирует глобальный объект window.AdminEditor с методом openLessonEditor(ls, isNew, onDone)
 // Русские комментарии сохранены.
 (function(){

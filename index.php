@@ -126,7 +126,7 @@ if (preg_match('~^/__assets__/(.+)$~', $uri, $am)) {
     exit;
 }
 
-// Маршрут: /bod — админка (HTML рендер здесь; JS — в bod/bod.js; API — в api.php)
+// Маршрут: админка (HTML рендер здесь; JS — в бандле админки; API — в api.php)
 if ($uri === '' || $uri === false) { $uri = '/'; }
 if ($uri === '/bod') {
     render_admin_page();
@@ -397,7 +397,7 @@ function render_404(): void {
     render_footer();
 }
 
-// ===== Рендер админки (HTML). JS загружается из bod/bod.js (action=admin_js в api.php отдаёт этот файл) =====
+// ===== Рендер админки (HTML). JS загружается из бандла админки (action=admin_js в api.php отдаёт этот файл) =====
 function render_admin_page(): void {
     // Админка: без верхней панели и переключателя темы, всегда светлая тема
     render_header('Админ-панель', false);

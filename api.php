@@ -3,7 +3,7 @@
  * api.php — централизованный роутер API
  *
  * Задача: принять параметр action и вызвать соответствующую функцию-обработчик.
- * Вся работа с БД — в db-api.php, авторизация — в bod/auth.php, загрузка изображений — в img-upload.php.
+ * Вся работа с БД — в db-api.php, авторизация — в модуле админки, загрузка изображений — в img-upload.php.
  */
 
 declare(strict_types=1);
@@ -83,7 +83,7 @@ if ($action === '') {
 
 switch ($action) {
     case 'admin_js':
-        // Совместимость: ранее JS админки генерировался из PHP. Теперь отдаём статический файл bod/bod.js.
+        // Совместимость: ранее JS админки генерировался из PHP. Теперь отдаём статический бандл админки.
         $path = __DIR__ . '/bod/bod.js';
         if (is_file($path)) {
             header('Content-Type: application/javascript; charset=utf-8');

@@ -224,7 +224,7 @@ body.theme-dark .answer.wrong{
   .lesson-list{ gap: 10px; }
   .section-list{ gap: 10px; }
   .grid.cards{ gap: 12px; }
-  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
+  /* Админка: модалка и элементы перенесены в стили админки */
 }
 
 /* Планшеты: 721–1280px */
@@ -232,7 +232,7 @@ body.theme-dark .answer.wrong{
   /* Планшеты: отступы для тестов */
   .tests{ gap: 14px; }
   .tests .test-question{ padding: 12px; border-radius: 12px; }
-  /* Админка: правила перенесены в bod/admin-style.css */
+  /* Админка: правила перенесены в стили админки */
 
   /* Карточки и правки админки */
   .card{ padding: 16px; }
@@ -241,7 +241,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 14px; }
   .section-list{ gap: 12px; }
   .lesson-list{ gap: 10px; }
-  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
+  /* Админка: модалка и элементы перенесены в стили админки */
 }
 
 /* Notebooks: 1281–1600px — правила выше для .tests */
@@ -252,7 +252,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 16px; }
   .section-list{ gap: 14px; }
   .lesson-list{ gap: 10px; }
-  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
+  /* Админка: модалка и элементы перенесены в стили админки */
 }
 
 /* Monitors: 1601–1920px — правила выше для .tests */
@@ -263,7 +263,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 18px; }
   .section-list{ gap: 16px; }
   .lesson-list{ gap: 12px; }
-  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
+  /* Админка: модалка и элементы перенесены в стили админки */
 }
 
 /* Large: 1921+ — правила выше для .tests */
@@ -274,7 +274,7 @@ body.theme-dark .answer.wrong{
   .grid.cards{ gap: 20px; }
   .section-list{ gap: 18px; }
   .lesson-list{ gap: 14px; }
-  /* Админка: модалка и элементы перенесены в bod/admin-style.css */
+  /* Админка: модалка и элементы перенесены в стили админки */
 }
 
 /* ============================

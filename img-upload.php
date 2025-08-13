@@ -10,7 +10,7 @@
 declare(strict_types=1);
 
 // Здесь не подключаем config.php напрямую — ожидаем, что файл подключается из api.php,
-// где уже подключены config.php и bod/auth.php (для is_admin_authenticated()) и доступна media_config().
+// где уже подключены config.php и модуль админки (для is_admin_authenticated()) и доступна media_config().
 
 /** Загрузка изображения в uploads/level_slug/section_slug/lesson_slug/, форматы: png,jpg,webp,gif; до 5 МБ (или из media_config) */
 function api_upload_image(): void {
