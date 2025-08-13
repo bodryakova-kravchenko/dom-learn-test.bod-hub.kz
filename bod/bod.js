@@ -40,7 +40,7 @@
     var msg = h('div', {class: 'admin-msg'});
 
     // Если есть сессионная авторизация — сразу в панель
-    fetch(u('/crud.php?action=session_ok')).then(function(r){ if(r.ok) return r.json(); throw 0; }).then(function(){ mountPanel(); }).catch(function(){
+    fetch(u('/api.php?action=session_ok')).then(function(r){ if(r.ok) return r.json(); throw 0; }).then(function(){ mountPanel(); }).catch(function(){
       // Если включён флаг remember — после логина не разлогинивать на перезагрузках
     });
 
@@ -48,7 +48,7 @@
       ev.preventDefault();
       var l = login.value.trim();
       var p = pass.value;
-      fetch(u('/crud.php?action=ping_login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({l:l,p:p})})
+      fetch(u('/api.php?action=ping_login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({l:l,p:p})})
         .then(function(r){ if(!r.ok) throw new Error('Неверный логин или пароль'); return r.json(); })
         .then(function(){ try{ if(remember.checked){ localStorage.setItem(LS_REMEMBER,'1'); } }catch(e){}; mountPanel(); })
         .catch(function(e){ msg.textContent = (e && e.message) ? e.message : 'Ошибка авторизации'; });
@@ -82,7 +82,7 @@
     actions.appendChild(logout);
     logout.addEventListener('click', function(){
       try{ localStorage.removeItem(LS_REMEMBER); }catch(e){}
-      fetch(u('/crud.php?action=logout'), {method:'POST'}).finally(mountLogin);
+      fetch(u('/api.php?action=logout'), {method:'POST'}).finally(mountLogin);
     });
     // Размещаем контейнер с кнопками справа через spacer + actions (grid: 1fr auto)
     var spacer = el('div','spacer');
@@ -98,7 +98,7 @@
     root.appendChild(shell);
 
     // Загрузка дерева
-    api(u('/crud.php?action=tree')).then(function(data){
+    api(u('/api.php?action=tree')).then(function(data){
       renderTree(left, right, data, openSectionId);
     }).catch(function(err){ left.textContent = 'Ошибка загрузки: '+err.message; });
   }
@@ -134,8 +134,8 @@
       addBtn.addEventListener('click', function(){
         var title = prompt('Название раздела (рус)'); if(!title) return;
         var slug = prompt('Slug (только a-z и -)'); if(!slug) return;
-        api(u('/crud.php?action=section_save'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ level_id: lv.id, title_ru: title, slug: slug })})
-          .then(function(){ return api(u('/crud.php?action=tree')); })
+        api(u('/api.php?action=section_save'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ level_id: lv.id, title_ru: title, slug: slug })})
+          .then(function(){ return api(u('/api.php?action=tree')); })
           .then(function(d){ data=d; levels=d.levels||[]; renderSections(); lessonsWrap.innerHTML=''; })
           .catch(function(e){ alert('Ошибка: '+e.message); });
       });
@@ -150,16 +150,16 @@
         edit.addEventListener('click', function(){
           var title = prompt('Название раздела', sec.title_ru); if(!title) return;
           var slug = prompt('Slug', sec.slug); if(!slug) return;
-          api(u('/crud.php?action=section_save'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: sec.id, level_id: lv.id, title_ru: title, slug: slug, section_order: sec.section_order })})
-            .then(function(){ return api(u('/crud.php?action=tree')); })
+          api(u('/api.php?action=section_save'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: sec.id, level_id: lv.id, title_ru: title, slug: slug, section_order: sec.section_order })})
+            .then(function(){ return api(u('/api.php?action=tree')); })
             .then(function(d){ data=d; levels=d.levels||[]; renderSections(); if(currentSectionId===sec.id){ var s=findSection(sec.id); if(s) renderLessons(s); } })
             .catch(function(e){ alert('Ошибка: '+e.message); });
         });
         var del = el('button','sm','🗑'); del.title='Удалить';
         del.addEventListener('click', function(){
           if(!confirm('Удалить раздел и все его уроки?')) return;
-          api(u('/crud.php?action=section_delete'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: sec.id })})
-            .then(function(){ return api(u('/crud.php?action=tree')); })
+          api(u('/api.php?action=section_delete'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: sec.id })})
+            .then(function(){ return api(u('/api.php?action=tree')); })
             .then(function(d){ data=d; levels=d.levels||[]; currentSectionId=null; renderSections(); lessonsWrap.innerHTML=''; })
             .catch(function(e){ alert('Ошибка: '+e.message); });
         });
@@ -222,8 +222,8 @@
         var del = el('button','sm','🗑'); del.title='Удалить';
         del.addEventListener('click', function(){
           if(!confirm('Удалить урок?')) return;
-          api(u('/crud.php?action=lesson_delete'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: ls.id })})
-            .then(function(){ return api(u('/crud.php?action=tree')); })
+          api(u('/api.php?action=lesson_delete'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: ls.id })})
+            .then(function(){ return api(u('/api.php?action=tree')); })
             .then(function(d){
               // Обновим локальные данные и перерисуем список для текущего раздела
               data = d; levels = d.levels||[];
@@ -334,7 +334,7 @@
           var form = new FormData();
           form.append('file', file);
           form.append('lesson_id', ls.id ? String(ls.id) : '0');
-          fetch(u('/crud.php?action=upload_image'), { method:'POST', body: form })
+          fetch(u('/api.php?action=upload_image'), { method:'POST', body: form })
             .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
             .then(function(json){ if(json && json.url){ resolve({ default: json.url }); } else { reject('Некорректный ответ сервера'); } })
             .catch(function(e){ reject(e); });
@@ -672,7 +672,7 @@
           theory_html: (ckeEditor? ckeEditor.getData() : (taTheory.value||''))
         }
       };
-      return api('/crud.php?action=lesson_save', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      return api('/api.php?action=lesson_save', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
     }
 
     btnSave.addEventListener('click', function(){

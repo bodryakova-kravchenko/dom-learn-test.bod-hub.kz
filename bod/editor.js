@@ -84,7 +84,7 @@
           var form = new FormData();
           form.append('file', file);
           form.append('lesson_id', ls.id ? String(ls.id) : '0');
-          fetch(u('/crud.php?action=upload_image'), { method:'POST', body: form })
+          fetch(u('/api.php?action=upload_image'), { method:'POST', body: form })
             .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
             .then(function(json){ if(json && json.url){ resolve({ default: json.url }); } else { reject('Некорректный ответ сервера'); } })
             .catch(function(e){ reject(e); });
@@ -343,7 +343,7 @@
           theory_html: (ckeEditor? ckeEditor.getData() : (taTheory.value||''))
         }
       };
-      return api('/crud.php?action=lesson_save', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      return api('/api.php?action=lesson_save', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
     }
 
     btnSave.addEventListener('click', function(){

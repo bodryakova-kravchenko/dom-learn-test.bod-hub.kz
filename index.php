@@ -1,17 +1,16 @@
 <?php
 // index.php
 // Публичная часть приложения: роутинг и отображение уровней, разделов и уроков.
-// ВНИМАНИЕ: Взаимодействие с БД и весь CRUD находятся в crud.php. Здесь только рендер публичных страниц.
+// ВНИМАНИЕ: Взаимодействие с БД вынесено в db-api.php. Здесь только рендер публичных страниц.
 
-// Включаем показ ошибок (по ТЗ — на время тестирования и в проде тоже)
+// Включаем показ ошибок (настройки также применяются в config.php)
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-session_start();
-
-// Подключаем функции чтения данных из crud.php (CRUD и подключение к БД реализованы там)
-require_once __DIR__ . '/crud.php';
+// Подключаем слой данных и хелперы (config.php подхватывается внутри db-api.php)
+require_once __DIR__ . '/db-api.php';
+require_once __DIR__ . '/helpers.php';
 
 // Утилита: безопасный вывод
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
@@ -20,11 +19,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES | ENT_SUB
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 $uri = rtrim($uri, '/');
 
-// Базовый путь приложения (если развернуто в подпапке домена)
-$__BASE = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
-if ($__BASE === '/') { $__BASE = ''; }
-function base_path(): string { global $__BASE; return $__BASE ?: ''; }
-function asset(string $path): string { $b = base_path(); return ($b === '' ? '' : $b) . $path; }
+// Базовый путь приложения (если развернуто в подпапке домена) — используем helpers::base_path()/asset()
 
 // Учитываем базовый путь при сопоставлении маршрутов
 if (base_path() !== '' && strpos($uri, base_path()) === 0) {
@@ -77,7 +72,7 @@ if (preg_match('~^/__assets__/(.+)$~', $uri, $am)) {
     exit;
 }
 
-// Маршрут: /bod — админка (HTML рендер здесь, JS и весь CRUD — в crud.php)
+// Маршрут: /bod — админка (HTML рендер здесь; JS — в bod/bod.js; API — в api.php)
 if ($uri === '' || $uri === false) { $uri = '/'; }
 if ($uri === '/bod') {
     render_admin_page();
@@ -348,7 +343,7 @@ function render_404(): void {
     render_footer();
 }
 
-// ===== Рендер админки (HTML). JS загружается из crud.php?action=admin_js =====
+// ===== Рендер админки (HTML). JS загружается из bod/bod.js (action=admin_js в api.php отдаёт этот файл) =====
 function render_admin_page(): void {
     // Админка: без верхней панели и переключателя темы, всегда светлая тема
     render_header('Админ-панель', false);

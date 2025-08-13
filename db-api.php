@@ -13,6 +13,23 @@ require_once __DIR__ . '/config.php';
 
 // ===== ПУБЛИЧНОЕ ЧТЕНИЕ =====
 
+// Фасадные функции совместимости для публичного рендера (используются в index.php)
+// Оставлены для обратной совместимости после удаления crud.php.
+/** Получить все уровни в порядке number ASC */
+function db_get_levels(): array { return db_levels_all(); }
+/** Получить уровень по number+slug */
+function db_get_level_by_number_slug(int $number, string $slug): ?array { return db_level_by_number_slug($number, $slug); }
+/** Секции по level_id (section_order ASC) */
+function db_get_sections_by_level_id(int $level_id): array { return db_sections_by_level($level_id); }
+/** Найти раздел по level_id + section_order + slug */
+function db_get_section_by_level_order_slug(int $level_id, int $order, string $slug): ?array { return db_section_by_level_order_slug($level_id, $order, $slug); }
+/** Уроки по section_id (lesson_order ASC) */
+function db_get_lessons_by_section_id(int $section_id): array { return db_lessons_by_section($section_id); }
+/** Найти урок по section_id + lesson_order + slug */
+function db_get_lesson_by_section_order_slug(int $section_id, int $order, string $slug): ?array { return db_lesson_by_section_order_slug($section_id, $order, $slug); }
+/** Предыдущий и следующий урок в разделе по lesson_order */
+function db_get_prev_next_lesson(int $section_id, int $order): array { return db_prev_next_lesson($section_id, $order); }
+
 /** Получить все уровни в порядке number ASC */
 function db_levels_all(): array {
     $stmt = db()->query('SELECT id, number, title_ru, slug FROM levels ORDER BY number ASC');

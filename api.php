@@ -3,22 +3,21 @@
  * api.php — централизованный роутер API
  *
  * Задача: принять параметр action и вызвать соответствующую функцию-обработчик.
- * На данном этапе обработчики продолжают жить в crud.php, а работа с БД — в db-api.php.
- * В следующих шагах вынесем загрузку изображений и авторизацию в отдельные файлы.
+ * Вся работа с БД — в db-api.php, авторизация — в bod/auth.php, загрузка изображений — в img-upload.php.
  */
 
 declare(strict_types=1);
 
-// Включаем ошибки на время рефакторинга
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
-if (session_status() === PHP_SESSION_NONE) session_start();
-
-// Подключаем необходимые слои
-require_once __DIR__ . '/crud.php'; // внутри уже подключены config.php и db-api.php
-require_once __DIR__ . '/img-upload.php'; // загрузка изображений вынесена сюда
+// Централизованные настройки окружения и сессии
+require_once __DIR__ . '/config.php';
+// Слой доступа к данным
+require_once __DIR__ . '/db-api.php';
+// Вспомогательные функции (json_response, base_path, asset, validate_slug, rrmdir)
+require_once __DIR__ . '/helpers.php';
+// Аутентификация администратора
+require_once __DIR__ . '/bod/auth.php';
+// Загрузка изображений
+require_once __DIR__ . '/img-upload.php';
 
 // Базовый путь (если развёрнуто в подпапке)
 $__BASE = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
@@ -36,13 +35,16 @@ if ($action === '') {
 
 switch ($action) {
     case 'admin_js':
-        // отдаём JS админки (временно остаётся здесь для совместимости)
-        header('Content-Type: application/javascript; charset=utf-8');
-        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
-        header('Expires: 0');
-        echo admin_js_bundle();
+        // Совместимость: ранее JS админки генерировался из PHP. Теперь отдаём статический файл bod/bod.js.
+        $path = __DIR__ . '/bod/bod.js';
+        if (is_file($path)) {
+            header('Content-Type: application/javascript; charset=utf-8');
+            header('Cache-Control: public, max-age=3600');
+            readfile($path);
+        } else {
+            http_response_code(404);
+            json_response(['error' => 'admin_js not found']);
+        }
         exit;
 
     case 'upload_image':
@@ -93,4 +95,65 @@ switch ($action) {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['error' => 'Unknown action'], JSON_UNESCAPED_UNICODE);
         exit;
+}
+
+// ================== Обработчики API (перенесены из crud.php) ==================
+
+function api_admin_tree(): void {
+    if (!is_admin_authenticated()) { http_response_code(401); json_response(['error'=>'Unauthorized']); return; }
+    $tree = db_admin_tree();
+    json_response($tree);
+}
+
+function api_section_save(): void {
+    if (!is_admin_authenticated()) { http_response_code(401); json_response(['error'=>'Unauthorized']); return; }
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['error'=>'method']); return; }
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    try {
+        $res = db_section_save($data);
+        json_response(['ok'=>true, 'id'=>$res['id']]);
+    } catch (RuntimeException $e) {
+        http_response_code(400);
+        json_response(['error'=>$e->getMessage()]);
+    }
+}
+
+function api_section_delete(): void {
+    if (!is_admin_authenticated()) { http_response_code(401); json_response(['error'=>'Unauthorized']); return; }
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['error'=>'method']); return; }
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    try {
+        db_section_delete($data['id']);
+        json_response(['ok'=>true]);
+    } catch (RuntimeException $e) {
+        http_response_code(400);
+        json_response(['error'=>$e->getMessage()]);
+    }
+}
+
+function api_lesson_save(): void {
+    if (!is_admin_authenticated()) { http_response_code(401); json_response(['error'=>'Unauthorized']); return; }
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['error'=>'method']); return; }
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    try {
+        $res = db_lesson_save($data);
+        json_response(['ok'=>true, 'id'=>$res['id']]);
+    } catch (RuntimeException $e) {
+        http_response_code(400);
+        json_response(['error'=>$e->getMessage()]);
+    }
+}
+
+function api_lesson_delete(): void {
+    if (!is_admin_authenticated()) { http_response_code(401); json_response(['error'=>'Unauthorized']); return; }
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['error'=>'method']); return; }
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    $id = (int)($data['id'] ?? 0);
+    try {
+        db_lesson_delete($id);
+        json_response(['ok'=>true]);
+    } catch (RuntimeException $e) {
+        http_response_code(400);
+        json_response(['error'=>$e->getMessage()]);
+    }
 }
