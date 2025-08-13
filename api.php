@@ -70,7 +70,7 @@ switch ($action) {
         exit;
 
     case 'ping_login':
-        if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['ok'=>false,'error'=>'method']); }
+        if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['ok'=>false,'error'=>'method']); exit; }
         $raw = file_get_contents('php://input');
         $data = json_decode($raw, true) ?: [];
         if (admin_login((string)($data['l'] ?? ''), (string)($data['p'] ?? ''))) {
@@ -79,7 +79,7 @@ switch ($action) {
         exit;
 
     case 'logout':
-        if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['ok'=>false,'error'=>'method']); }
+        if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['ok'=>false,'error'=>'method']); exit; }
         admin_logout();
         json_response(['ok'=>true]);
         exit;
