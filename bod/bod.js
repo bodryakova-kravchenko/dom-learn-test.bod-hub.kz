@@ -65,6 +65,7 @@
     // Поддержка базового префикса: если путь абсолютный и начинается с '/', префиксуем BASE
     if (typeof url === 'string' && url.charAt(0) === '/') url = u(url);
     opt = opt || {};
+    if (!('credentials' in opt)) opt.credentials = 'same-origin';
     return fetch(url, opt).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
   }
 
