@@ -1,0 +1,30 @@
+# Security for uploads directory
+# Disable directory listing
+Options -Indexes
+
+# Do not allow script execution in uploads
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+Options -ExecCGI
+
+# Deny access to executable file types
+<FilesMatch "\.(php|phar|phtml|php3|php4|php5|shtml|cgi|pl|py|sh|bash)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Remove handlers for potentially executable types just in case
+<IfModule mod_mime.c>
+  RemoveHandler .php .phar .phtml .php3 .php4 .php5 .shtml .cgi .pl .py .sh .bash
+  RemoveType .php .phar .phtml .php3 .php4 .php5 .shtml .cgi .pl .py .sh .bash
+</IfModule>
+
+# Prevent content-type sniffing
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>

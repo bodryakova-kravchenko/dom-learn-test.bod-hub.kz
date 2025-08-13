@@ -17,6 +17,23 @@ require_once __DIR__ . '/config.php';
 // Оставлены для обратной совместимости после удаления crud.php.
 /** Получить все уровни в порядке number ASC */
 function db_get_levels(): array { return db_levels_all(); }
+
+// ===== ВСПОМОГАТЕЛЬНЫЕ УТИЛИТЫ ДЛЯ ПУТЕЙ ЗАГРУЗОК =====
+/**
+ * Получить слаги уровня/раздела/урока по lesson_id.
+ * Возвращает массив: ['level_slug'=>..., 'section_slug'=>..., 'lesson_slug'=>...]
+ */
+function db_slugs_by_lesson_id(int $lesson_id): ?array {
+    $sql = 'SELECT lv.slug AS level_slug, sc.slug AS section_slug, ls.slug AS lesson_slug
+            FROM lessons ls
+            JOIN sections sc ON sc.id = ls.section_id
+            JOIN levels lv ON lv.id = sc.level_id
+            WHERE ls.id = ? LIMIT 1';
+    $st = db()->prepare($sql);
+    $st->execute([$lesson_id]);
+    $row = $st->fetch();
+    return $row ?: null;
+}
 /** Получить уровень по number+slug */
 function db_get_level_by_number_slug(int $number, string $slug): ?array { return db_level_by_number_slug($number, $slug); }
 /** Секции по level_id (section_order ASC) */
@@ -151,10 +168,16 @@ function db_section_delete(int $id): void {
     $ls = db()->prepare('SELECT id FROM lessons WHERE section_id=?');
     $ls->execute([$id]);
     foreach ($ls->fetchAll() as $row) {
-        $path = __DIR__ . '/images/lesson_' . (int)$row['id'];
-        if (is_dir($path)) {
-            // локальная утилита удаления
-            db_rrmdir($path);
+        // Удаляем легаси папку
+        $legacy = __DIR__ . '/images/lesson_' . (int)$row['id'];
+        if (is_dir($legacy)) { db_rrmdir($legacy); }
+        // Удаляем новый путь uploads/level/section/lesson
+        $sl = db_slugs_by_lesson_id((int)$row['id']);
+        if ($sl) {
+            $mc = media_config();
+            $uploads = rtrim($mc['uploads_dir'] ?? (__DIR__ . '/uploads'), '/\\');
+            $up = $uploads . '/' . $sl['level_slug'] . '/' . $sl['section_slug'] . '/' . $sl['lesson_slug'];
+            if (is_dir($up)) { db_rrmdir($up); }
         }
     }
     $st = db()->prepare('DELETE FROM sections WHERE id=?');
@@ -204,8 +227,17 @@ function db_lesson_save(array $data): array {
 /** Удалить урок и его папку изображений */
 function db_lesson_delete(int $id): void {
     if ($id <= 0) throw new RuntimeException('id required');
-    $path = __DIR__ . '/images/lesson_' . $id;
-    if (is_dir($path)) db_rrmdir($path);
+    // legacy images path
+    $legacy = __DIR__ . '/images/lesson_' . $id;
+    if (is_dir($legacy)) db_rrmdir($legacy);
+    // new uploads path
+    $sl = db_slugs_by_lesson_id($id);
+    if ($sl) {
+        $mc = media_config();
+        $uploads = rtrim($mc['uploads_dir'] ?? (__DIR__ . '/uploads'), '/\\');
+        $up = $uploads . '/' . $sl['level_slug'] . '/' . $sl['section_slug'] . '/' . $sl['lesson_slug'];
+        if (is_dir($up)) db_rrmdir($up);
+    }
     $st = db()->prepare('DELETE FROM lessons WHERE id=?');
     $st->execute([$id]);
 }

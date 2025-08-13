@@ -12,7 +12,7 @@ declare(strict_types=1);
 // Здесь не подключаем config.php напрямую — ожидаем, что файл подключается из api.php,
 // где уже подключены config.php и bod/auth.php (для is_admin_authenticated()) и доступна media_config().
 
-/** Загрузка изображения в images/lesson_{lesson_id}/, форматы: png,jpg,webp,gif; до 5 МБ (или из media_config) */
+/** Загрузка изображения в uploads/level_slug/section_slug/lesson_slug/, форматы: png,jpg,webp,gif; до 5 МБ (или из media_config) */
 function api_upload_image(): void {
     // Проверка метода
     if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -88,12 +88,23 @@ function api_upload_image(): void {
         $ext = $map[$mime] ?? 'png';
     }
 
-    // Каталог урока
-    $imagesRoot = $mc['images_dir'] ?? (__DIR__ . '/images');
-    $dir = rtrim($imagesRoot, '/\\') . '/lesson_' . $lesson_id;
-    if (!is_dir($dir)) {
-        @mkdir($dir, 0775, true);
+    // Разрешение пути загрузки по слагам
+    if (!function_exists('db_slugs_by_lesson_id')) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'db helper missing']);
+        return;
     }
+    $sl = db_slugs_by_lesson_id($lesson_id);
+    if (!$sl) {
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'lesson not found']);
+        return;
+    }
+    $uploadsRoot = $mc['uploads_dir'] ?? (__DIR__ . '/uploads');
+    $dir = rtrim($uploadsRoot, '/\\') . '/' . $sl['level_slug'] . '/' . $sl['section_slug'] . '/' . $sl['lesson_slug'];
+    if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
 
     // Генерируем безопасное имя файла
     $base = pathinfo($file['name'], PATHINFO_FILENAME);
@@ -108,7 +119,7 @@ function api_upload_image(): void {
         return;
     }
 
-    $urlBase = '/images/lesson_' . $lesson_id . '/';
+    $urlBase = '/uploads/' . $sl['level_slug'] . '/' . $sl['section_slug'] . '/' . $sl['lesson_slug'] . '/';
     $url = $urlBase . $name;
     header('Content-Type: application/json');
     echo json_encode(['url' => $url, 'filename' => $name]);

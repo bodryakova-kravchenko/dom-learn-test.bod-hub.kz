@@ -70,6 +70,32 @@ if (preg_match('~^/assets/(.+)$~', $uri, $am)) {
     exit;
 }
 
+// Обслуживаем загруженные медиа из /uploads с безопасной валидацией пути
+if (preg_match('~^/uploads/(.+)$~', $uri, $um)) {
+    $rel = $um[1];
+    $uploadsRoot = realpath(__DIR__ . '/uploads');
+    $path = realpath(__DIR__ . '/uploads/' . $rel);
+    if ($uploadsRoot !== false && $path !== false && strpos($path, $uploadsRoot) === 0 && is_file($path)) {
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $types = [
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg'=> 'image/jpeg',
+            'gif' => 'image/gif',
+            'webp'=> 'image/webp',
+            'ico' => 'image/x-icon',
+            'svg' => 'image/svg+xml'
+        ];
+        $ct = $types[$ext] ?? 'application/octet-stream';
+        header('Content-Type: ' . $ct);
+        header('Cache-Control: public, max-age=604800'); // 7 дней
+        readfile($path);
+    } else {
+        http_response_code(404);
+    }
+    exit;
+}
+
 // Обслуживаем статические файлы под специальным префиксом, чтобы обойти 404 со стороны веб-сервера
 if (preg_match('~^/__assets__/(.+)$~', $uri, $am)) {
     $rel = $am[1];

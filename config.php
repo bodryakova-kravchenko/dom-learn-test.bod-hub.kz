@@ -120,18 +120,21 @@ function admin_credentials(): array {
 // -------- Медиа-конфигурация --------
 /**
  * Параметры загрузки изображений.
- * - Каталог для картинок: /images
+ * - Новый каталог для загрузок: /uploads (структура: /uploads/level_slug/section_slug/lesson_slug)
+ * - Легаси каталог картинок: /images (старый формат: images/lesson_{lesson_id}/)
  * - Максимальный размер: 5 МБ (можно изменить через ENV: UPLOAD_MAX_MB)
  * - Разрешённые расширения и MIME-типы
  */
 function media_config(): array {
     $root = __DIR__;
     $imagesDir = $root . '/images';
+    $uploadsDir = $root . '/uploads';
     $maxMb = (int)(env_get('UPLOAD_MAX_MB', '5'));
     $maxBytes = max(1, $maxMb) * 1024 * 1024;
     return [
         'root' => $root,
-        'images_dir' => $imagesDir,
+        'images_dir' => $imagesDir,   // legacy
+        'uploads_dir' => $uploadsDir, // new
         'max_bytes' => $maxBytes,
         'allowed_ext' => ['png','jpg','jpeg','webp','gif'],
         'allowed_mime' => ['image/png','image/jpeg','image/webp','image/gif'],

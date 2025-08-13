@@ -23,6 +23,54 @@ require_once __DIR__ . '/img-upload.php';
 $__BASE = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
 if ($__BASE === '/') { $__BASE = ''; }
 
+/**
+ * Миграция файлов: images/lesson_{lesson_id} -> uploads/level_slug/section_slug/lesson_slug
+ * Только для админов. Метод: POST. Возвращает статистику переноса.
+ */
+function api_migrate_uploads(): void {
+    if (!is_admin_authenticated()) { http_response_code(401); json_response(['error'=>'Unauthorized']); return; }
+    if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') { http_response_code(405); json_response(['error'=>'method']); return; }
+    $mc = media_config();
+    $root = $mc['root'] ?? __DIR__;
+    $images = rtrim($mc['images_dir'] ?? ($root . '/images'), '/\\');
+    $uploads = rtrim($mc['uploads_dir'] ?? ($root . '/uploads'), '/\\');
+
+    $moved = 0; $copied = 0; $skipped = 0; $errors = [];
+
+    try {
+        // Получаем все уроки с их id для прохода
+        $st = db()->query('SELECT id FROM lessons');
+        $lessonIds = array_map(fn($r) => (int)$r['id'], $st->fetchAll());
+        foreach ($lessonIds as $lid) {
+            $legacyDir = $images . '/lesson_' . $lid;
+            if (!is_dir($legacyDir)) { continue; }
+            $sl = db_slugs_by_lesson_id($lid);
+            if (!$sl) { $errors[] = "no slugs for lesson {$lid}"; continue; }
+            $targetDir = $uploads . '/' . $sl['level_slug'] . '/' . $sl['section_slug'] . '/' . $sl['lesson_slug'];
+            if (!is_dir($targetDir)) { @mkdir($targetDir, 0775, true); }
+            $items = scandir($legacyDir) ?: [];
+            foreach ($items as $it) {
+                if ($it === '.' || $it === '..') continue;
+                $src = $legacyDir . '/' . $it;
+                if (!is_file($src)) { continue; }
+                $dst = $targetDir . '/' . $it;
+                if (is_file($dst)) { $skipped++; continue; }
+                // Пытаемся переместить; если не удалось (например, между томами) — копируем
+                if (@rename($src, $dst)) { $moved++; }
+                else if (@copy($src, $dst)) { @unlink($src); $copied++; }
+                else { $errors[] = "failed to move/copy {$src}"; }
+            }
+            // Пытаемся удалить пустую легаси-папку
+            @rmdir($legacyDir);
+        }
+    } catch (Throwable $e) {
+        http_response_code(500);
+        json_response(['error'=>'migration failed','message'=>$e->getMessage(), 'moved'=>$moved, 'copied'=>$copied, 'skipped'=>$skipped, 'errors'=>$errors]);
+        return;
+    }
+    json_response(['ok'=>true, 'moved'=>$moved, 'copied'=>$copied, 'skipped'=>$skipped, 'errors'=>$errors]);
+}
+
 // Читаем action
 $action = $_GET['action'] ?? '';
 
@@ -89,6 +137,11 @@ switch ($action) {
     case 'session_ok':
         // Возвращаем 200 всегда, чтобы не засорять консоль 401 при первой загрузке
         json_response(['ok' => is_admin_authenticated() ? true : false]);
+        exit;
+
+    case 'migrate_uploads':
+        // Перенос изображений из /images/lesson_{id} в /uploads/level/section/lesson
+        api_migrate_uploads();
         exit;
 
     default:
