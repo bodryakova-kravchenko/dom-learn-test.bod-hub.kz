@@ -42,6 +42,34 @@ if ($uri === '/favicon.ico') {
     exit;
 }
 
+// Обслуживаем статические файлы из /assets без mod_rewrite (надёжно на любом хостинге)
+if (preg_match('~^/assets/(.+)$~', $uri, $am)) {
+    $rel = $am[1];
+    $path = realpath(__DIR__ . '/assets/' . $rel);
+    $root = realpath(__DIR__ . '/assets');
+    if ($path !== false && strpos($path, $root) === 0 && is_file($path)) {
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $types = [
+            'css' => 'text/css; charset=utf-8',
+            'js'  => 'application/javascript; charset=utf-8',
+            'ico' => 'image/x-icon',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg'=> 'image/jpeg',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'webp'=> 'image/webp'
+        ];
+        $ct = $types[$ext] ?? 'application/octet-stream';
+        header('Content-Type: ' . $ct);
+        header('Cache-Control: public, max-age=3600');
+        readfile($path);
+    } else {
+        http_response_code(404);
+    }
+    exit;
+}
+
 // Обслуживаем статические файлы под специальным префиксом, чтобы обойти 404 со стороны веб-сервера
 if (preg_match('~^/__assets__/(.+)$~', $uri, $am)) {
     $rel = $am[1];
@@ -299,9 +327,9 @@ function render_header(string $title, bool $with_topbar = true): void {
     echo '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
     echo '<title>' . e($title) . ' — DOMLearn</title>';
     echo '<link rel="icon" href="' . asset('/images/favicon.ico') . '" type="image/x-icon">';
-    // Публичные стили подключаем напрямую из /assets/style.css, чтобы работало без mod_rewrite
+    // Публичные стили и скрипты из /assets (с версионированием через filemtime)
     echo '<link rel="stylesheet" href="' . asset('/assets/style.css') . '?v=' . filemtime(__DIR__ . '/assets/style.css') . '">';
-    echo '<script src="' . asset('/app.js') . '?v=' . filemtime(__DIR__ . '/app.js') . '" defer></script>';
+    echo '<script src="' . asset('/assets/app.js') . '?v=' . filemtime(__DIR__ . '/assets/app.js') . '" defer></script>';
     echo '</head><body class="theme-light">';
     if ($with_topbar) {
         echo '<header class="topbar">';
