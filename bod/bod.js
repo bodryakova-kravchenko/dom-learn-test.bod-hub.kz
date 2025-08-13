@@ -48,7 +48,7 @@
       ev.preventDefault();
       var l = login.value.trim();
       var p = pass.value;
-      fetch(u('/api.php?action=ping_login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({l:l,p:p})})
+      fetch(u('/api.php?action=ping_login'), {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({l:l,p:p}), credentials: 'same-origin'})
         .then(function(r){ if(!r.ok) throw new Error('Неверный логин или пароль'); return r.json(); })
         .then(function(){ try{ if(remember.checked){ localStorage.setItem(LS_REMEMBER,'1'); } }catch(e){}; mountPanel(); })
         .catch(function(e){ msg.textContent = (e && e.message) ? e.message : 'Ошибка авторизации'; });
@@ -335,7 +335,7 @@
           var form = new FormData();
           form.append('file', file);
           form.append('lesson_id', ls.id ? String(ls.id) : '0');
-          fetch(u('/api.php?action=upload_image'), { method:'POST', body: form })
+          fetch(u('/api.php?action=upload_image'), { method:'POST', body: form, credentials: 'same-origin' })
             .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
             .then(function(json){ if(json && json.url){ resolve({ default: json.url }); } else { reject('Некорректный ответ сервера'); } })
             .catch(function(e){ reject(e); });

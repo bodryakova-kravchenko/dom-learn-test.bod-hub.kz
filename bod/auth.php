@@ -31,6 +31,8 @@ function admin_login(string $login, string $password): bool {
             @session_regenerate_id(true);
         }
         $_SESSION['admin_ok'] = true;
+        // Сразу закрываем сессию, чтобы данные записались до следующего запроса
+        if (function_exists('session_write_close')) { @session_write_close(); }
     }
     return $ok;
 }
